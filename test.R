@@ -21,6 +21,8 @@ fit$pvalue
 fit$coefAN
 1.96*fit$sigmaAN/sqrt(nobs)
 
+#2* 1.96*fit$sigmaAN/sqrt(nobs) / abs(fit$coefAN)
+
 ## fit using logistic
 system.time(fit <- cInfer(x, y, weight = c(0, 0, 1, 1, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3, parallel = FALSE))
 system.time(fit <- cInfer(x, y, weight = c(0, 0, 1, 1, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3))
@@ -36,3 +38,5 @@ fit$pvalue
 ## adjusted estimates and sd estimation, which is asymptotic normal
 fit$coefAN
 1.96*fit$sigmaAN/sqrt(nobs)
+
+#2* 1.96*fit$sigmaAN/sqrt(nobs) / abs(fit$coefAN)
