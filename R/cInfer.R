@@ -1,12 +1,12 @@
 #cInfer implement the decorrelated score for testing and interval estimation
-cInfer <- function(x, y, coef = NULL, lossType='logistic', parallel = TRUE, indexToTest = NULL, intercept=FALSE, ...){
+cInfer <- function(x, y, fit = NULL, lossType='logistic', parallel = TRUE, indexToTest = NULL, intercept=TRUE, ...){
   #set sample size
   n <- length(y)
   # if coef=NULL
-  if (is.null(coef)){
+  if (is.null(fit)){
     fit <- cv.cLearn(x=x, y=y, lambdaSeq = NULL, lossType = lossType, parallel = parallel, ...)
-    coef <- fit$fit$coef[,fit$lambda.seq==fit$lambda.opt]
   }
+  coef <- fit$fit$coef[,fit$lambda.seq==fit$lambda.opt]
 
   # if indextoTest is null
   if (is.null(indexToTest)){
