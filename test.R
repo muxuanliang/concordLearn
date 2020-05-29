@@ -6,8 +6,8 @@ beta_true <- c(1,-1,0.5,-0.5, rep(0, times=p-4))
 y <- apply(x, 1, function(t){rbinom(1,1, prob = exp(t%*%beta_true)/ (1+exp(t%*%beta_true)))})
 
 ## fit using smoothed_hinge
-system.time(fit <- cInfer(x, y, weight = c(0, 0, 0, 0, rep(1, times= p-4)), lossType = 'smoothed_hinge', tol = 1e-3, parallel = FALSE))
-system.time(fit <- cInfer(x, y, weight = c(0, 0, 0, 0, rep(1, times= p-4)), lossType = 'smoothed_hinge', tol = 1e-3))
+system.time(fit <- cInfer(x, y, weight = c(0, 0, 1, 1, rep(1, times= p-4)), lossType = 'smoothed_hinge', tol = 1e-3, parallel = FALSE))
+system.time(fit <- cInfer(x, y, weight = c(0, 0, 1, 1, rep(1, times= p-4)), lossType = 'smoothed_hinge', tol = 1e-3))
 ## estimated coef
 fit$coef
 
@@ -22,8 +22,8 @@ fit$coefAN
 1.96*fit$sigmaAN/sqrt(nobs)
 
 ## fit using logistic
-system.time(fit <- cInfer(x, y, weight = c(0, 0, 0, 0, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3, parallel = FALSE))
-system.time(fit <- cInfer(x, y, weight = c(0, 0, 0, 0, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3))
+system.time(fit <- cInfer(x, y, weight = c(0, 0, 1, 1, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3, parallel = FALSE))
+system.time(fit <- cInfer(x, y, weight = c(0, 0, 1, 1, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3))
 ## estimated coef
 fit$coef
 
