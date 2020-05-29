@@ -30,7 +30,7 @@ loss <- function(t, type = 'logistic', order = 0, ...){
     ))
   } else if (order == 2){
     return(switch (type,
-                   'logistic' = -exp(-t)/(1+exp(-t)),
+                   'logistic' = exp(-t)/(1+exp(-t))^2,
                    'exponential' = e^(-t),
                    'smoothed_hinge' = sHinge(t,order=order, ...)
     ))
