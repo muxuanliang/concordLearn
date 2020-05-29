@@ -1,6 +1,4 @@
 # cv.cLearn utilizes cross-validation to tuning lambda
-
-
 cv.cLearn <- function(x, y, lambdaSeq = NULL, weight = rep(1, NCOL(x)), lossType='logistic', nlambda = 100, nfolds=5, parallel = TRUE,ratio  = 10/11, tol = 1e-4, maxIter = 10^3, ...){
   # check wether only 2 classes
   stopifnot(length(levels(factor(y))) == 2)
