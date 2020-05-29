@@ -50,7 +50,7 @@ solver <- function(x, y, lambda, betaInit = c(rep(0.1, NCOL(x))), weight = rep(1
   iter <- 1
   dif <- 10^3
   while((iter < maxIter) & (dif > tol)){
-    ### calculate v
+    ### calculate v, utilizing FISTA
     v <- betaSeq[,iter+1] + (iter-2)/(iter+1) * (betaSeq[,iter+1]-betaSeq[,iter])
     ### calculate grad
     lossValue <- mean(loss(y*x %*% v, type = lossType, order = 0 , ...))
@@ -59,10 +59,10 @@ solver <- function(x, y, lambda, betaInit = c(rep(0.1, NCOL(x))), weight = rep(1
     ### set back tracking parameter
     t <- 1
     ratio <- 0.8
-    ### set first try
+    ### set first try, proximal gradient descent
     newbeta <- soft.Thresh(v-t * grad, thresh = t * lambda * weight)
     newLossValue <- mean(loss(y*x %*% newbeta, type = lossType, order = 0 , ...))
-    ### find appropriate step size
+    ### find appropriate step size by back tracking
     while(newLossValue > (lossValue+t(grad) %*% (newbeta-v)+sum((newbeta-v)^2)/(2*t))){
       t <- t * ratio
       newbeta <- soft.Thresh(v-t * grad, thresh = t * lambda * weight)
