@@ -19,7 +19,7 @@ cv.cLearn <- function(x, y, lambdaSeq = NULL, weight = rep(1, NCOL(x)), lossType
   if(nfolds<3)stop("nfolds must be bigger than 3; nfolds=5 recommended")
   outlist <- list()
 
-  if (parallel && require(foreach)) {
+  if (parallel & require(foreach)) {
     library(doParallel)
     n_cores <- detectCores(all.tests = FALSE, logical = TRUE)
     cl <- makeCluster(min(n_cores, nfolds))
