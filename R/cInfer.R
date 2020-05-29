@@ -4,7 +4,7 @@ cInfer <- function(x, y, coef = NULL, lossType='logistic', parallel = TRUE, inde
   n <- length(y)
   # if coef=NULL
   if (is.null(coef)){
-    fit <- cv.cLearn(x=x, y=y, lambdaSeq = NULL, lossType = lossType, ...)
+    fit <- cv.cLearn(x=x, y=y, lambdaSeq = NULL, lossType = lossType, parallel = parallel, ...)
     coef <- fit$fit$coef[,fit$lambda.seq==fit$lambda.opt]
   }
 
@@ -51,7 +51,7 @@ cInfer <- function(x, y, coef = NULL, lossType='logistic', parallel = TRUE, inde
       Itmp <- loss(y * link, lossType=lossType, order=2, ...) * pseudo.y * (pseudo.y - link_w)
       coefAN[index] <- coef[indexToTest[index]]-mean(tmp) /(mean(Itmp))
       sigma[index] <- sqrt(mean((tmp)^2))
-      I[index] <- (mean(Itmp)*2)
+      I[index] <- (mean(Itmp))
 
       sigma[index] <- sqrt(mean((tmpNULL)^2))
     }
@@ -86,7 +86,7 @@ cInfer <- function(x, y, coef = NULL, lossType='logistic', parallel = TRUE, inde
       Itmp <- loss(y * link, lossType=lossType, order=2, ...) * pseudo.y * (pseudo.y - link_w)
       coefAN <- coef[indexToTest[index]]-mean(tmp) /(mean(Itmp))
       sigma <- sqrt(mean((tmp)^2))
-      I <- (mean(Itmp)*2)
+      I <- (mean(Itmp))
       sigma <- sqrt(mean((tmpNULL)^2))
       list(fit_w = fit_w, score=score, sigma=sigma, coefAN=coefAN, I=I)
     }
