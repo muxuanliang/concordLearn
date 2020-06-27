@@ -36,7 +36,7 @@ cInfer <- function(x, y=list(y1, y2, y3), fit = NULL, weight = rep(1, times=NCOL
   }
 
   # calculate link and first order derivative
-  link <- as.matrix(apply(pracma::repmat(x %*% coef, 1, n.cutoff), 1, function(t){t-off.set}))
+  link <- matrix(apply(pracma::repmat(x %*% coef, 1, n.cutoff), 1, function(t){t-off.set}), nrow = n, ncol = n.cutoff, byrow = TRUE)
   first.order <- array(0, c(n, n.cutoff))
   for (i in 1:n.cutoff){
     first.order[,i] <- y[[i]] * loss(y[[i]] * link[,i], lossType=lossType, order=1, ...)
@@ -65,7 +65,7 @@ cInfer <- function(x, y=list(y1, y2, y3), fit = NULL, weight = rep(1, times=NCOL
       coefNULL <- coef
       coefNULL[indexToTest[index]] <- 0
       # get score under null
-      linkNULL <- as.matrix(apply(pracma::repmat(x %*% coefNULL, 1, n.cutoff), 1, function(t){t-off.set}))
+      linkNULL <- matrix(apply(pracma::repmat(x %*% coefNULL, 1, n.cutoff), 1, function(t){t-off.set}), nrow = n, ncol = n.cutoff, byrow = TRUE)
       first.orderNULL <- array(0, c(n, n.cutoff))
       for (i in 1:n.cutoff){
         first.orderNULL[,i] <- y[[i]] * loss(y[[i]] * linkNULL[,i], lossType=lossType, order=1, ...)
@@ -103,7 +103,7 @@ cInfer <- function(x, y=list(y1, y2, y3), fit = NULL, weight = rep(1, times=NCOL
       coefNULL <- coef
       coefNULL[indexToTest[index]] <- 0
       # get score under null
-      linkNULL <- as.matrix(apply(pracma::repmat(x %*% coefNULL, 1, n.cutoff), 1, function(t){t-off.set}))
+      linkNULL <- matrix(apply(pracma::repmat(x %*% coefNULL, 1, n.cutoff), 1, function(t){t-off.set}), nrow = n, ncol = n.cutoff, byrow = TRUE)
       first.orderNULL <- array(0, c(n, n.cutoff))
       for (i in 1:n.cutoff){
         first.orderNULL[,i] <- y[[i]] * loss(y[[i]] * linkNULL[,i], lossType=lossType, order=1, ...)
