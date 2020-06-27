@@ -1,5 +1,5 @@
 #cInfer implement the decorrelated score for testing and interval estimation
-cInfer <- function(x, y=list(y1, y2, y3), fit = NULL, weight = rep(1, times=NCOL(x)), lossType='logistic', parallel = TRUE, indexToTest = NULL, intercept=TRUE, ...){
+cInfer <- function(x, y=list(y1, y2, y3), fit = NULL, weight = rep(1, times=NCOL(x)), lossType='logistic', parallel = TRUE, indexToTest = NULL, ...){
   # reset weight
   weight <- c(rep(0, times=length(y)), weight)
 
