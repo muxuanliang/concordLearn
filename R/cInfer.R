@@ -79,7 +79,7 @@ cInfer <- function(x, y=list(y1, y2, y3), fit = NULL, weight = rep(1, times=NCOL
 
       # set betaAN
       tmp <- pseudo.y-link_w
-      Itmp <- (x[,indexToTest[index]])^2 * apply(second.order, 1, sum) - predict(fit_w[[index]], newx = cbind(apply(x[, -indexToTest[index]], 2, function(t){t * apply(second.order, 1, sum) * x[,indexToTest[index]]}), apply(second.order, 2, function(t){t * x[,indexToTest[index]]})), s=fit_w[[index]]$lambda.min)
+      Itmp <- (x[,indexToTest[index]])^2 * apply(second.order, 1, sum) - predict(fit_w[[index]], newx = cbind(apply(x[, -indexToTest[index]], 2, function(t){t * apply(second.order, 1, sum) * x[,indexToTest[index]]}), -apply(second.order, 2, function(t){t * x[,indexToTest[index]]})), s=fit_w[[index]]$lambda.min)
       coefAN[index] <- coef[indexToTest[index]]-mean(tmp) /(mean(Itmp))
       sigma[index] <- sqrt(mean((tmp)^2))
       I[index] <- (mean(Itmp))
@@ -117,7 +117,7 @@ cInfer <- function(x, y=list(y1, y2, y3), fit = NULL, weight = rep(1, times=NCOL
 
       # set betaAN
       tmp <- pseudo.y-link_w
-      Itmp <- (x[,indexToTest[index]])^2 * apply(second.order, 1, sum) - predict(fit_w, newx = cbind(apply(x[, -indexToTest[index]], 2, function(t){t * apply(second.order, 1, sum) * x[,indexToTest[index]]}), apply(second.order, 2, function(t){t * x[,indexToTest[index]]})), s=fit_w$lambda.min)
+      Itmp <- (x[,indexToTest[index]])^2 * apply(second.order, 1, sum) - predict(fit_w, newx = cbind(apply(x[, -indexToTest[index]], 2, function(t){t * apply(second.order, 1, sum) * x[,indexToTest[index]]}), -apply(second.order, 2, function(t){t * x[,indexToTest[index]]})), s=fit_w$lambda.min)
       coefAN <- coef[indexToTest[index]]-mean(tmp) /(mean(Itmp))
       sigma <- sqrt(mean((tmp)^2))
       I <- (mean(Itmp))
