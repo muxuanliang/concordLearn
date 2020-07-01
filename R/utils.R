@@ -19,19 +19,19 @@ loss <- function(t, type = 'logistic', order = 0, ...){
   if (order == 0){
     return(switch (type,
       'logistic' = log(1+exp(-t)),
-      'exponential' = exp^(-t),
+      'exponential' = exp(-t),
       'smoothed_hinge' = sHinge(t,order=order, ...)
     ))
   } else if (order == 1){
     return(switch (type,
                    'logistic' = -exp(-t)/(1+exp(-t)),
-                   'exponential' = -exp^(-t),
+                   'exponential' = -exp(-t),
                    'smoothed_hinge' = sHinge(t,order=order, ...)
     ))
   } else if (order == 2){
     return(switch (type,
                    'logistic' = exp(-t)/(1+exp(-t))^2,
-                   'exponential' = e^(-t),
+                   'exponential' = exp(-t),
                    'smoothed_hinge' = sHinge(t,order=order, ...)
     ))
   }
