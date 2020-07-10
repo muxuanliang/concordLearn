@@ -1,8 +1,5 @@
 #cInfer implement the decorrelated score for testing and interval estimation
-cInfer <- function(x, y=list(y1, y2, y3), fit = NULL, weight = rep(1, times=NCOL(x)), lossType='logistic', parallel = TRUE, indexToTest = NULL, ...){
-  # reset weight
-  weight <- c(rep(0, times=length(y)), weight)
-
+cInfer <- function(x, y=list(y1, y2, y3), y_refit = NULL, fit = NULL, weight = rep(1, times=NCOL(x)), lossType='logistic', parallel = TRUE, indexToTest = NULL, ...){
   # set how any outcomes
   n.cutoff <- length(y)
 
@@ -25,10 +22,33 @@ cInfer <- function(x, y=list(y1, y2, y3), fit = NULL, weight = rep(1, times=NCOL
 
   # if coef=NULL
   if (is.null(fit)){
-    fit <- cv.cLearn(x=x.combine, y=y.combine, lambdaSeq = NULL, weight = weight, lossType = lossType, parallel = parallel, ...)
+    fit <- cv.cLearn(x=x.combine, y=y.combine, lambdaSeq = NULL, weight = c(rep(0, times=length(y)), weight), lossType = lossType, parallel = parallel, ...)
   }
   coef <- fit$fit$coef[-(1:n.cutoff),fit$lambda.seq==fit$lambda.opt]
   off.set <- fit$fit$coef[(1:n.cutoff),fit$lambda.seq==fit$lambda.opt]
+
+  if (!is.null(y_refit)){
+    # set y_refit
+    y_refit <- lapply(y_refit, function(t){
+      t.ones <- rep(1, length(t))
+      if (((levels(factor(t))[1]) != "-1")|(levels(factor(t))[2] != "1")){
+        t.ones[factor(t)==levels(factor(t))[1]] <- -1
+        t.ones[factor(t)==levels(factor(t))[2]] <- 1
+      }
+      t.ones
+    })
+
+    # change to one cutoff
+    n.cutoff <- 1
+    x.refit <- cbind(-1, x %*% coef, x)
+    y <- unlist(y_refit)
+
+    # refit
+    fit_refit <- cv.cLearn(x=x.refit, y=unlist(y_refit), lambdaSeq = NULL, weight = c(0, 1, weight), lossType = lossType, parallel = parallel, ...)
+
+    coef <- fit_refit$fit$coef[-(1:2),fit_refit$lambda.seq==fit_refit$lambda.opt]+fit_refit$fit$coef[2,fit_refit$lambda.seq==fit_refit$lambda.opt]*coef
+    off.set <- fit_refit$fit$coef[1,fit_refit$lambda.seq==fit_refit$lambda.opt]
+  }
 
   # if indextoTest is null
   if (is.null(indexToTest)){
