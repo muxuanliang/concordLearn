@@ -10,6 +10,17 @@ cv.cLearn <- function(x, y, lambdaSeq = NULL, weight = rep(1, NCOL(x)), lossType
   if (as.numeric(levels(factor(y))[2]) != 1){
     y[factor(y)==levels(factor(y))[2]] <- 1
   }
+
+  # use glmnet for logistic loss
+  if (lossType=='logistic'){
+    fit <- glmnet::cv.glmnet(x=x, y=y, family='binomial', penalty.factor=weight, intercept = FALSE, parallel = parallel)
+    fit$glmnet.fit$coef <- fit$glmnet.fit$beta
+    out <- list(cvm=fit$cvm,cvsd=fit$cvsd,cvup=fit$cvup,
+                cvlo=fit$cvlo, cvraw = NULL, fit=fit$glmnet.fit, lambda.seq=fit$lambda, lambda.opt=fit$lambda.min)
+    class(out) <- "cv.cLearn"
+    return(out)
+  }
+
   # fit on all data
   fit <- cLearn(x=x, y=y, lambdaSeq = lambdaSeq, weight = weight, lossType = lossType, nlambda = nlambda, ratio = ratio, tol = tol, maxIter = maxIter, ...)
   # set lambda
