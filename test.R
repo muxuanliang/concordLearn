@@ -55,7 +55,7 @@ n_cores <- detectCores(all.tests = FALSE, logical = TRUE)
 cl <- makeCluster(n_cores)
 registerDoParallel(cl)
 
-alpha_seq <- c(0.25, 0.5, 0.75, 1)
+alpha_seq <- c(1)
 for (alpha in alpha_seq){
   simulation(sample.size = 200, p=1000, alpha = alpha)
   simulation(sample.size = 350, p=1000, alpha = alpha)
