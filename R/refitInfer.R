@@ -30,7 +30,7 @@ refitInfer <- function(x, y, refit = NULL, lossType='logistic', parallel = TRUE,
       pseudo.x <- cbind(x[, -indexToTest[index]], -1)
       pseudo.y <- x[,indexToTest[index]]
       #fit w
-      fit_w[[index]] <- glmnet::cv.glmnet(x=pseudo.x, y=pseudo.y, weights = second.order, penalty.factor=c(rep(1, NCOL(x)-1), 0), intercept = FALSE, standardize = FALSE)
+      fit_w[[index]] <- glmnet::cv.glmnet(x=pseudo.x, y=pseudo.y, weights = second.order, penalty.factor=c(rep(1, NCOL(x)-1), 0), intercept = TRUE, standardize = FALSE)
       link_w <- predict(fit_w[[index]], newx = pseudo.x, s=fit_w[[index]]$lambda.min)
       # set beta null
       coefNULL <- coef
@@ -62,7 +62,7 @@ refitInfer <- function(x, y, refit = NULL, lossType='logistic', parallel = TRUE,
       pseudo.x <- cbind(x[, -indexToTest[index]], -1)
       pseudo.y <- x[,indexToTest[index]]
       #fit w
-      fit_w <- glmnet::cv.glmnet(x=pseudo.x, y=pseudo.y, weights = second.order, intercept = FALSE, standardize = FALSE)
+      fit_w <- glmnet::cv.glmnet(x=pseudo.x, y=pseudo.y, weights = second.order, intercept = TRUE, standardize = FALSE)
       link_w <- predict(fit_w, newx = pseudo.x, s=fit_w$lambda.min)
       # set beta null
       coefNULL <- coef

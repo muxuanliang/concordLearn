@@ -7,11 +7,11 @@ simulation <- function(sample.size = 500, p = 500, alpha=0){
   x <- array(rnorm(nobs*p), c(nobs, p))
   beta_true <- c(1,-1,1,-1, rep(0, times=p-4))
   beta_modify <- c(1,1,1,1, rep(0, times=p-4))
-  U <- 5*pnorm(x%*%beta_true) + rnorm(nobs)
+  U <- 5*pnorm(x%*%beta_true) + 0.2*rnorm(nobs)
   y1 <- U
-  y2 <- (1-alpha) * U+alpha * (5*pnorm(-x%*%beta_modify) + rnorm(nobs))
-  cutoff <- quantile(U)[c(2,4)]
-  y.cutoff <- list(y1>cutoff[1], y2>cutoff[2])
+  U1 <-  (5*pnorm(x%*%beta_modify) + 0.2*rnorm(nobs))
+  y2 <- (1-alpha) * U+alpha * U1
+  y.cutoff <- list(y1>quantile(U)[2], y2>quantile(y2)[3])
 
   # concord score
   #(mean(y.cutoff[[1]]*y.cutoff[[2]])-mean(y.cutoff[[1]])*mean(y.cutoff[[2]]))/var(y.cutoff[[2]])
@@ -28,13 +28,13 @@ simulation <- function(sample.size = 500, p = 500, alpha=0){
   # testing data
   x.test <- array(rnorm(10^4*p), c(10^4, p))
   y.test.nonoise <- 5*pnorm(x.test%*%beta_true)
-  y.test <- y.test.nonoise + rnorm(10^4)
-  y.test.label <- (y.test>cutoff[1])
+  y.test <- y.test.nonoise + 0.2*rnorm(10^4)
+  y.test.label <- (y.test>quantile(U)[2])
   #score.class.hinge.trans <- mean((x.test %*% fit_hinge_trans$coef > fit_hinge_trans$off.set) == y.test.label)
   #score.class.hinge <- mean((x.test %*% fit_hinge$coef > fit_hinge$off.set) == y.test.label)
-  score.class.logistic.trans <- mean((x.test %*% fit_logistic_trans$coef > fit_logistic_trans$off.set) == y.test.label)
-  score.class.logistic.comb <- mean((x.test %*% fit_logistic_comb$coef > fit_logistic_comb$off.set[1]) == y.test.label)
-  score.class.logistic <- mean((x.test %*% fit_logistic$coef > fit_logistic$off.set) == y.test.label)
+  score.class.logistic.trans <- mean((x.test %*% fit_logistic_trans$coef >= fit_logistic_trans$off.set) == y.test.label)
+  score.class.logistic.comb <- mean((x.test %*% fit_logistic_comb$coef >= fit_logistic_comb$off.set[1]) == y.test.label)
+  score.class.logistic <- mean((x.test %*% fit_logistic$coef >= fit_logistic$off.set) == y.test.label)
   #score.rank.hinge.trans <- cor(x.test %*% fit_hinge_trans$coef,y=y.test.nonoise, method='kendall')
   #score.rank.hinge <- cor(x.test %*% fit_hinge$coef,y=y.test.nonoise, method='kendall')
   score.rank.logistic.trans <- cor(x.test %*% fit_logistic_trans$coef,y=y.test.nonoise, method='kendall')
@@ -55,11 +55,11 @@ n_cores <- detectCores(all.tests = FALSE, logical = TRUE)
 cl <- makeCluster(n_cores)
 registerDoParallel(cl)
 
-alpha_seq <- c(0,0.25,0.5,0.75,1)
+alpha_seq <- c(0.25, 0.5, 0.75, 1)
 for (alpha in alpha_seq){
-  simulation(sample.size = 200, p=500, alpha = alpha)
-  simulation(sample.size = 350, p=500, alpha = alpha)
-  simulation(sample.size = 500, p=500, alpha = alpha)
+  simulation(sample.size = 200, p=1000, alpha = alpha)
+  simulation(sample.size = 350, p=1000, alpha = alpha)
+  simulation(sample.size = 500, p=1000, alpha = alpha)
 }
 
 

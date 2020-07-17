@@ -20,14 +20,28 @@ cInfer <- function(x, y=list(y1, y2, y3), y_refit = NULL, fit = NULL, weight = r
   x.combine <- cbind(apply(-pracma::eye(n.cutoff), 1, function(t){pracma::repmat(t, n, 1)}), pracma::repmat(x, n.cutoff, 1))
   y.combine <- unlist(y)
 
+
+
   # if coef=NULL
   if (is.null(fit)){
-    fit <- cv.cLearn(x=x.combine, y=y.combine, lambdaSeq = NULL, weight = c(rep(0, times=length(y)), weight), lossType = lossType, parallel = parallel, ...)
-  }
+    # if unly one outcome
+    if (n.cutoff == 1){
+      fit <- cv.cLearn(x=x, y=y.combine, lambdaSeq = NULL, weight = weight, lossType = lossType, parallel = parallel, intercept=TRUE, ...)
+      coef <- fit$fit$coef[,fit$lambda.seq==fit$lambda.opt]
+      off.set <- -fit$fit$a0[fit$lambda.seq==fit$lambda.opt]
 
-  # set coef and off.set
-  coef <- fit$fit$coef[-(1:n.cutoff),fit$lambda.seq==fit$lambda.opt]
-  off.set <- fit$fit$coef[(1:n.cutoff),fit$lambda.seq==fit$lambda.opt]
+      return(refitInfer(x=x, y=y.combine, refit = list(coef=coef, off.set=off.set), lossType=lossType, parallel = parallel, indexToTest = indexToTest, ...))
+    } else {
+      fit <- cv.cLearn(x=x.combine, y=y.combine, lambdaSeq = NULL, weight = c(rep(0, times=length(y)), weight), lossType = lossType, parallel = parallel, ...)
+      # set coef and off.set
+      coef <- fit$fit$coef[-(1:n.cutoff),fit$lambda.seq==fit$lambda.opt]
+      off.set <- fit$fit$coef[(1:n.cutoff),fit$lambda.seq==fit$lambda.opt]
+    }
+  } else {
+    # set coef and off.set
+    coef <- fit$fit$coef[-(1:n.cutoff),fit$lambda.seq==fit$lambda.opt]
+    off.set <- fit$fit$coef[(1:n.cutoff),fit$lambda.seq==fit$lambda.opt]
+  }
 
   if (!is.null(y_refit)){
     # set y_refit
@@ -42,13 +56,13 @@ cInfer <- function(x, y=list(y1, y2, y3), y_refit = NULL, fit = NULL, weight = r
 
     # change to one cutoff
     n.cutoff <- 1
-    x.refit <- cbind(-1, x %*% coef, x)
+    x.refit <- cbind(x %*% coef, x)
     y.refit <- unlist(y_refit)
 
     # refit
-    fit_refit <- cv.cLearn(x=x.refit, y=y.refit, lambdaSeq = NULL, weight = c(0, 1, weight), lossType = lossType, parallel = parallel, ...)
-    coef <- fit_refit$fit$coef[-(1:2),fit_refit$lambda.seq==fit_refit$lambda.opt]+fit_refit$fit$coef[2,fit_refit$lambda.seq==fit_refit$lambda.opt]*coef
-    off.set <- fit_refit$fit$coef[1,fit_refit$lambda.seq==fit_refit$lambda.opt]
+    fit_refit <- cv.cLearn(x=x.refit, y=y.refit, lambdaSeq = NULL, weight = c(1, weight), lossType = lossType, parallel = parallel, intercept=TRUE, ...)
+    coef <- fit_refit$fit$coef[-1,fit_refit$lambda.seq==fit_refit$lambda.opt]+fit_refit$fit$coef[1,fit_refit$lambda.seq==fit_refit$lambda.opt]*coef
+    off.set <- -fit_refit$fit$a0[fit_refit$lambda.seq==fit_refit$lambda.opt]
 
     return(refitInfer(x=x, y=y.refit, refit = list(coef=coef, off.set=off.set), lossType=lossType, parallel = parallel, indexToTest = indexToTest, ...))
   }
