@@ -28,7 +28,8 @@ cInfer <- function(x, y=list(y1, y2, y3), y_refit = NULL, fit = NULL, weight = r
     if (n.cutoff == 1){
       fit <- cv.cLearn(x=x, y=y.combine, lambdaSeq = NULL, weight = weight, lossType = lossType, parallel = parallel, intercept=TRUE, ...)
       coef <- fit$fit$coef[,fit$lambda.seq==fit$lambda.opt]
-      off.set <- -fit$fit$a0[fit$lambda.seq==fit$lambda.opt]
+      if(lossType == "logistic") off.set <- -fit$fit$a0[fit$lambda.seq==fit$lambda.opt]
+      else off.set <- -fit$fit$coef[(1:n.cutoff),fit$lambda.seq==fit$lambda.opt]
 
       return(refitInfer(x=x, y=y.combine, refit = list(coef=coef, off.set=off.set), lossType=lossType, parallel = parallel, indexToTest = indexToTest, ...))
     } else {
@@ -62,7 +63,9 @@ cInfer <- function(x, y=list(y1, y2, y3), y_refit = NULL, fit = NULL, weight = r
     # refit
     fit_refit <- cv.cLearn(x=x.refit, y=y.refit, lambdaSeq = NULL, weight = c(1, weight), lossType = lossType, parallel = parallel, intercept=TRUE, ...)
     coef <- fit_refit$fit$coef[-1,fit_refit$lambda.seq==fit_refit$lambda.opt]+fit_refit$fit$coef[1,fit_refit$lambda.seq==fit_refit$lambda.opt]*coef
-    off.set <- -fit_refit$fit$a0[fit_refit$lambda.seq==fit_refit$lambda.opt]
+    if(lossType == "logistic") off.set <- -fit_refit$fit$a0[fit_refit$lambda.seq==fit_refit$lambda.opt]
+    else off.set <- -fit_refit$fit$coef[(1:n.cutoff),fit_refit$lambda.seq==fit_refit$lambda.opt]
+
 
     return(refitInfer(x=x, y=y.refit, refit = list(coef=coef, off.set=off.set), lossType=lossType, parallel = parallel, indexToTest = indexToTest, ...))
   }
