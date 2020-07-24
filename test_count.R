@@ -8,26 +8,37 @@ simulation <- function(sample.size = 500, p = 500, alpha=0){
     beta_true <- c(1,-1,1,-1, rep(0, times=p-4))
     beta_modify <- c(1,1,1,1, rep(0, times=p-4))
     mix <- rbinom(nobs, 1, 1-alpha)
-    U <- mix*sapply(pnorm(x%*%beta_true), function(t){rbinom(1, 3, t)})+(1-mix)*0
-    y.cutoff <- list(U>0, U>1)
-    
+    U <- sapply(pnorm(x%*%beta_true), function(t){
+      v <- rbinom(1, 4, t)
+      if (v==1){
+        v <- rbinom(1, 1, 1-alpha)
+      }
+      v
+    })
+    y.cutoff <- list(U>0, U>3)
+
     # concord score
     #(mean(y.cutoff[[1]]*y.cutoff[[2]])-mean(y.cutoff[[1]])*mean(y.cutoff[[2]]))/var(y.cutoff[[2]])
-    
+
     ## fit using smoothed_hinge
     #system.time(fit_hinge_trans <- cInfer(x, y=y.cutoff, y_refit = list(y>cutoff[1]), weight = c(1, 1, 1, 1, rep(1, times= p-4)), lossType = 'smoothed_hinge', tol = 1e-3, parallel = FALSE))
     #system.time(fit_hinge <- cInfer(x, y=list(y>cutoff[1]), weight = c(1, 1, 1, 1, rep(1, times= p-4)), lossType = 'smoothed_hinge', tol = 1e-3, parallel = FALSE))
-    
+
     ## fit using logistic
     system.time(fit_logistic_trans <- cInfer(x, y=y.cutoff, y_refit = list(y.cutoff[[1]]), weight = c(1, 1, 1, 1, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3, parallel = FALSE))
     system.time(fit_logistic_comb <- cInfer(x, y=y.cutoff, weight = c(1, 1, 1, 1, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3, parallel = FALSE))
     system.time(fit_logistic <- cInfer(x, y=list(y.cutoff[[1]]), weight = c(1, 1, 1, 1, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3, parallel = FALSE))
-    
+
     # testing data
     x.test <- array(rnorm(10^4*p), c(10^4, p))
     y.test.nonoise <- (x.test%*%beta_true)
-    mix.test <- rbinom(nobs, 10^4, 1-alpha)
-    y.test <-  mix*sapply(pnorm(x.test%*%beta_true), function(t){rbinom(1, 3, t)})+(1-mix)*0
+    y.test <-  sapply(pnorm(x.test%*%beta_true), function(t){
+      v <- rbinom(1, 4, t)
+      if (v==1){
+        v <- rbinom(1, 1, 1-alpha)
+      }
+      v
+    })
     y.test.label <- (y.test>0)
     #score.class.hinge.trans <- mean((x.test %*% fit_hinge_trans$coef > fit_hinge_trans$off.set) == y.test.label)
     #score.class.hinge <- mean((x.test %*% fit_hinge$coef > fit_hinge$off.set) == y.test.label)
@@ -39,8 +50,8 @@ simulation <- function(sample.size = 500, p = 500, alpha=0){
     score.rank.logistic.trans <- cor(x.test %*% fit_logistic_trans$coef,y=y.test.nonoise, method='kendall')
     score.rank.logistic.comb <- cor(x.test %*% fit_logistic_comb$coef,y=y.test.nonoise, method='kendall')
     score.rank.logistic <- cor(x.test %*% fit_logistic$coef,y=y.test.nonoise, method='kendall')
-    
-    
+
+
     c(score=c(score.class.logistic.trans,score.class.logistic.comb,score.class.logistic,
               score.rank.logistic.trans,score.rank.logistic.comb,score.rank.logistic), pvalue=c(fit_logistic_trans$pvalue, fit_logistic_comb$pvalue, fit_logistic$pvalue))
   }))
@@ -54,7 +65,7 @@ n_cores <- detectCores(all.tests = FALSE, logical = TRUE)
 cl <- makeCluster(n_cores)
 registerDoParallel(cl)
 
-alpha_seq <- c(0,0.25, 0.5)
+alpha_seq <- c(0,0.1, 0.2)
 for (alpha in alpha_seq){
   simulation(sample.size = 200, p=1000, alpha = alpha)
   simulation(sample.size = 350, p=1000, alpha = alpha)
