@@ -10,8 +10,12 @@ simulation <- function(sample.size = 500, p = 500, alpha=0){
     mix <- rbinom(nobs, 1, 1-alpha)
     U <- sapply(pnorm(x%*%beta_true), function(t){
       v <- rbinom(1, 4, t)
-      if (v==1){
-        v <- rbinom(1, 1, 1-alpha)
+      if (v==3){
+        v.add <- rbinom(1, 1, alpha)
+        v <- v+v.add
+      } else if (v==4){
+        v.add <- rbinom(1, 1, alpha)
+        v <- v-v.add
       }
       v
     })
@@ -34,8 +38,12 @@ simulation <- function(sample.size = 500, p = 500, alpha=0){
     y.test.nonoise <- (x.test%*%beta_true)
     y.test <-  sapply(pnorm(x.test%*%beta_true), function(t){
       v <- rbinom(1, 4, t)
-      if (v==1){
-        v <- rbinom(1, 1, 1-alpha)
+      if (v==3){
+        v.add <- rbinom(1, 1, alpha)
+        v <- v+v.add
+      } else if (v==4){
+        v.add <- rbinom(1, 1, alpha)
+        v <- v-v.add
       }
       v
     })
@@ -57,7 +65,7 @@ simulation <- function(sample.size = 500, p = 500, alpha=0){
   }))
   apply(res[,1:6], 2, mean, na.rm = TRUE)
   apply(res[,7:30],2,function(t){mean(t<0.05)})
-  save(res, file=paste0("~/Simulations/concordLearn/sim2","_",sample.size,"_",p,"_",alpha,"_transfer.RData"))
+  save(res, file=paste0("/mnt/c/Users/lmx19/Documents/Simulations/concordLearn/sim2","_",sample.size,"_",p,"_",alpha,"_transfer.RData"))
 }
 
 library(doParallel)
@@ -65,7 +73,7 @@ n_cores <- detectCores(all.tests = FALSE, logical = TRUE)
 cl <- makeCluster(n_cores)
 registerDoParallel(cl)
 
-alpha_seq <- c(0,0.1, 0.2)
+alpha_seq <- c(0,0.1, 0.25, 0.5, 0.75)
 for (alpha in alpha_seq){
   simulation(sample.size = 200, p=1000, alpha = alpha)
   simulation(sample.size = 350, p=1000, alpha = alpha)
