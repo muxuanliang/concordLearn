@@ -1,5 +1,5 @@
 # cv.cLearn utilizes cross-validation to tuning lambda
-cv.cLearn <- function(x, y, lambdaSeq = NULL, weight = rep(1, NCOL(x)), lossType='logistic', nlambda = 100, nfolds=5, parallel = TRUE,ratio  = 10/11, tol = 1e-4, maxIter = 10^3, intercept=FALSE, ...){
+cv.cLearn <- function(x, y, lambdaSeq = NULL, weight = rep(1, NCOL(x)), lossType='logistic', nlambda = 100, nfolds=5, parallel = TRUE,ratio  = 10/11, tol = 1e-4, maxIter = 10^3, intercept=FALSE, offset=NULL, ...){
   # check wether only 2 classes
   stopifnot(length(levels(factor(y))) == 2)
   nobs <- length(y)
@@ -13,7 +13,7 @@ cv.cLearn <- function(x, y, lambdaSeq = NULL, weight = rep(1, NCOL(x)), lossType
 
   # use glmnet for logistic loss
   if (lossType=='logistic'){
-    fit <- glmnet::cv.glmnet(x=x, y=y, family='binomial', penalty.factor=weight, intercept = intercept, parallel = parallel)
+    fit <- glmnet::cv.glmnet(x=x, y=y, family='binomial', penalty.factor=weight, intercept = intercept, parallel = parallel,offset = offset)
     fit$glmnet.fit$coef <- fit$glmnet.fit$beta
     out <- list(cvm=fit$cvm,cvsd=fit$cvsd,cvup=fit$cvup,
                 cvlo=fit$cvlo, cvraw = NULL, fit=fit$glmnet.fit, lambda.seq=fit$lambda, lambda.opt=fit$lambda.min)

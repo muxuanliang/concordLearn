@@ -1,10 +1,22 @@
-simulation <- function(sample.size = 500, p = 500, alpha=0){
+simulation <- function(sample.size = 500, p = 500, alpha=0, rate=0){
   print(system.time(res <- foreach(index = 1:500,.packages = c('concordLearn'),.combine = rbind,.errorhandling='remove')%dopar%{
     ## test
     set.seed(index)
     nobs <- sample.size
     p <- p
-    x <- array(rnorm(nobs*p), c(nobs, p))
+
+    V <- function(p, rate = 0.5){
+      V.matrix <- array(0, c(p,p))
+      for (i in 1:p){
+        for (j in 1:p){
+          V.matrix[i,j] <- rate ^ (abs(i-j))
+        }
+      }
+      V.matrix
+    }
+
+
+    x <- mgcv::rmvn(sample.size, rep(0, times=p), V(p, rate))
     beta_true <- c(1,-1,1,-1, rep(0, times=p-4))
     beta_modify <- c(1,1,1,1, rep(0, times=p-4))
     mix <- rbinom(nobs, 1, 1-alpha)
@@ -34,7 +46,7 @@ simulation <- function(sample.size = 500, p = 500, alpha=0){
     system.time(fit_logistic <- cInfer(x, y=list(y.cutoff[[1]]), weight = c(1, 1, 1, 1, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3, parallel = FALSE))
 
     # testing data
-    x.test <- array(rnorm(10^4*p), c(10^4, p))
+    x.test <- mgcv::rmvn(10^4, rep(0, times=p), V(p, rate))
     y.test.nonoise <- (x.test%*%beta_true)
     y.test <-  sapply(pnorm(x.test%*%beta_true), function(t){
       v <- rbinom(1, 4, t)
@@ -65,7 +77,7 @@ simulation <- function(sample.size = 500, p = 500, alpha=0){
   }))
   apply(res[,1:6], 2, mean, na.rm = TRUE)
   apply(res[,7:30],2,function(t){mean(t<0.05)})
-  save(res, file=paste0("/mnt/c/Users/lmx19/Documents/Simulations/concordLearn/sim2","_",sample.size,"_",p,"_",alpha,"_transfer.RData"))
+  save(res, file=paste0("/mnt/c/Users/lmx19/Documents/Simulations/concordLearn/sim2","_",sample.size,"_",p,"_",alpha,"_", rate, "_transfer.RData"))
 }
 
 library(doParallel)
@@ -73,11 +85,12 @@ n_cores <- detectCores(all.tests = FALSE, logical = TRUE)
 cl <- makeCluster(n_cores)
 registerDoParallel(cl)
 
-alpha_seq <- c(0,0.1, 0.25, 0.5, 0.75)
+rate <- 0.5
+alpha_seq <- c(0, 0.1, 0.25, 0.5, 0.75)
 for (alpha in alpha_seq){
-  simulation(sample.size = 200, p=1000, alpha = alpha)
-  simulation(sample.size = 350, p=1000, alpha = alpha)
-  simulation(sample.size = 500, p=1000, alpha = alpha)
+  simulation(sample.size = 200, p=1000, alpha = alpha, rate = rate)
+  simulation(sample.size = 350, p=1000, alpha = alpha, rate = rate)
+  simulation(sample.size = 500, p=1000, alpha = alpha, rate = rate)
 }
 
 
