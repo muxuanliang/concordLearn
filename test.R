@@ -1,5 +1,5 @@
 simulation <- function(sample.size = 500, p = 500, alpha=0, rate=0){
-  print(system.time(res <- foreach(index = 1:50,.packages = c('concordLearn'),.combine = rbind,.errorhandling='remove')%dopar%{
+  print(system.time(res <- foreach(index = 1:500,.packages = c('concordLearn', 'RMTL'),.combine = rbind,.errorhandling='remove')%dopar%{
   ## test
   set.seed(index)
   nobs <- sample.size
@@ -36,10 +36,10 @@ simulation <- function(sample.size = 500, p = 500, alpha=0, rate=0){
   system.time(fit_logistic_comb <- cInfer(x, y=y.cutoff, weight = c(1, 1, 1, 1, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3, parallel = FALSE))
   system.time(fit_logistic <- cInfer(x, y=list(y.cutoff[[1]]), weight = c(1, 1, 1, 1, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3, parallel = FALSE))
   system.time(fit_logistic_trans_sai <- simTrans(x, y=y.cutoff, y_refit = list(y.cutoff[[1]]), weight = c(1, 1, 1, 1, rep(1, times= p-4)), lossType = 'logistic', tol = 1e-3, parallel = FALSE))
-  mtl1.cvfit<-RMTL::cvMTL(list(x,x), list(y1=c(2*(y.cutoff[[1]]-0.5)),y2=c(2*(y.cutoff[[2]]-0.5))), type="Classification", Regularization="L21",
+  mtl1.cvfit<-cvMTL(list(x,x), list(y1=c(2*(y.cutoff[[1]]-0.5)),y2=c(2*(y.cutoff[[2]]-0.5))), type="Classification", Regularization="L21",
                Lam2=0, opts=list(init=0,  tol=10^-6, maxIter=1500), nfolds=5,
                stratify=TRUE, Lam1_seq=10^seq(1,-4, -1))
-  fit_logistic_mtl1 <- RMTL::MTL(list(x,x), list(y1=c(2*(y.cutoff[[1]]-0.5)),y2=c(2*(y.cutoff[[2]]-0.5))), type="Classification", Regularization="L21",
+  fit_logistic_mtl1 <- MTL(list(x,x), list(y1=c(2*(y.cutoff[[1]]-0.5)),y2=c(2*(y.cutoff[[2]]-0.5))), type="Classification", Regularization="L21",
                            Lam1=mtl1.cvfit$Lam1.min, Lam2=0, opts=list(init=0,  tol=10^-6, maxIter=1500))
   #mtl2.cvfit<-RMTL::cvMTL(list(x,x), list(y1=c(2*(y.cutoff[[1]]-0.5)),y2=c(2*(y.cutoff[[2]]-0.5))), type="Classification", Regularization="Graph",
   #                        Lam2=0, opts=list(init=0,  tol=10^-6, maxIter=1500), nfolds=5,
@@ -75,7 +75,7 @@ simulation <- function(sample.size = 500, p = 500, alpha=0, rate=0){
   }))
   print(apply(res[,1:10], 2, mean, na.rm = TRUE))
   print(apply(res[,11:34],2,function(t){mean(t<0.05)}))
-  #save(res, file=paste0("/mnt/c/Users/lmx19/Documents/Simulations/concordLearn/sim","_",sample.size,"_",p,"_",alpha,"_", rate,"_transfer.RData"))
+  save(res, file=paste0("/mnt/c/Users/lmx19/Documents/Simulations/concordLearn/sim","_",sample.size,"_",p,"_",alpha,"_", rate,"_transfer.RData"))
 }
 
 library(doParallel)
@@ -87,8 +87,8 @@ rate <- 0
 
 alpha_seq <- c(0,0.25,0.5,0.75,1)
 for (alpha in alpha_seq){
-  #simulation(sample.size = 200, p=1000, alpha = alpha, rate=rate)
-  #simulation(sample.size = 350, p=1000, alpha = alpha, rate=rate)
+  simulation(sample.size = 200, p=1000, alpha = alpha, rate=rate)
+  simulation(sample.size = 350, p=1000, alpha = alpha, rate=rate)
   simulation(sample.size = 500, p=1000, alpha = alpha, rate=rate)
 }
 

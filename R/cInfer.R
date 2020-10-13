@@ -61,7 +61,7 @@ cInfer <- function(x, y=list(y1, y2, y3), y_refit = NULL, fit = NULL, weight = r
     y.refit <- unlist(y_refit)
 
     # refit
-    fit_refit <- cv.cLearn(x=x.refit, y=y.refit, lambdaSeq = NULL, weight = c(1, weight), lossType = lossType, parallel = parallel, intercept=TRUE, ...)
+    fit_refit <- cv.cLearn(x=x.refit, y=y.refit, lambdaSeq = NULL, weight = c(0, weight), lossType = lossType, parallel = parallel, intercept=TRUE, ...)
     coef <- fit_refit$fit$coef[-1,fit_refit$lambda.seq==fit_refit$lambda.opt]+fit_refit$fit$coef[1,fit_refit$lambda.seq==fit_refit$lambda.opt]*coef
     if(lossType == "logistic") off.set <- -fit_refit$fit$a0[fit_refit$lambda.seq==fit_refit$lambda.opt]
     else off.set <- -fit_refit$fit$coef[(1:n.cutoff),fit_refit$lambda.seq==fit_refit$lambda.opt]
