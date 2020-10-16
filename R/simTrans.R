@@ -62,10 +62,9 @@ simTrans <- function(x, y=list(y1, y2, y3), y_refit = NULL, fit = NULL, weight =
     y.refit <- unlist(y_refit)
 
     # refit
-    fit_refit <- cv.cLearn(x=x.refit, y=y.refit, lambdaSeq = NULL, lossType = lossType, parallel = parallel, intercept=TRUE, offset=offset.refit, ...)
-    coef <- fit_refit$fit$coef[,fit_refit$lambda.seq==fit_refit$lambda.opt]+coef
-    if(lossType == "logistic") off.set <- -fit_refit$fit$a0[fit_refit$lambda.seq==fit_refit$lambda.opt]
-    else off.set <- -fit_refit$fit$coef[(1:n.cutoff),fit_refit$lambda.seq==fit_refit$lambda.opt]
+    fit_refit <- cv.simTrans(x=x.refit, y=y.refit, lambdaSeq = NULL, lossType = lossType, parallel = parallel, intercept=TRUE, offset=offset.refit, ...)
+    coef <- fit_refit$fit$coefficients[-1,fit_refit$lambda.seq==fit_refit$lambda.opt]+coef
+    off.set <- -fit_refit$fit$coefficients[1,fit_refit$lambda.seq==fit_refit$lambda.opt]
 
 
     return(list(coef=coef, off.set=off.set))
