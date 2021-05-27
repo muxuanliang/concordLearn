@@ -39,7 +39,7 @@ cv.simTrans <- function(x, y, lambdaSeq = NULL, weight = rep(1, NROW(x)), lossTy
   }else{
     for(i in seq(nfolds)){
       which=foldid==i
-      outlist[[i]]=grplasso::grplasso(x=cbind(1,x[!which,,drop=FALSE]), y=0.5*(y[!which]+1), ,index=c(NA,1:p), lambda = lambdaSeq, weights = weight[!which], offset = offset[!which])
+      outlist[[i]]=grplasso::grplasso(x=cbind(1,x[!which,,drop=FALSE]), y=0.5*(y[!which]+1), index=c(NA,1:p), lambda = lambdaSeq, weights = weight[!which], offset = offset[!which])
     }
   }
 

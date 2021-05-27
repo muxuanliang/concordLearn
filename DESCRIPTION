@@ -1,11 +1,10 @@
-Package: concordLearn
+Package: 
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Title: This package implments the joint-model-assisted high dimensional linear decision rule
+Version: 1.0.0
+Author: Anonymous
+Maintainer: Anonymous <yourself@somewhere.net>
+Description: The package implements the proposed method used in the simulation and application to heart failure readmission prediction.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
