@@ -2,7 +2,7 @@
 
 Description: The package implements the proposed method used in the simulation and application to heart failure readmission prediction in this paper.
 
-License: GPL-3
+License: MIT
 
 ## Requirements
 
@@ -37,6 +37,8 @@ The following example shows hwo to use the package and the main functrion cInfer
 ``` Synethetic data generation
 nobs <- 500
 p <- 500
+rate <- 0
+alpha <- 0
 V <- function(p, rate = 0.5){
   V.matrix <- array(0, c(p,p))
   for (i in 1:p){
@@ -44,9 +46,9 @@ V <- function(p, rate = 0.5){
       V.matrix[i,j] <- rate ^ (abs(i-j))
     }
   }
- V.matrix
+  V.matrix
 }
-x <- mgcv::rmvn(sample.size, rep(0, times=p), V(p, rate))
+x <- mgcv::rmvn(nobs, rep(0, times=p), V(p, rate))
 beta_true <- c(1,-1,1,-1, rep(0, times=p-4))
 beta_modify <- c(1,1,1,1, rep(0, times=p-4))
 mix <- rbinom(nobs, 1, 1-alpha)
