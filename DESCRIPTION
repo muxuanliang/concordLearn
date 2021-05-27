@@ -1,10 +1,11 @@
-Package: 
+Package: ModelAssistClassify
 Type: Package
 Title: This package implments the joint-model-assisted high dimensional linear decision rule
 Version: 1.0.0
 Author: Anonymous
 Maintainer: Anonymous <yourself@somewhere.net>
 Description: The package implements the proposed method used in the simulation and application to heart failure readmission prediction.
-License: What license is it under?
+License: MIT
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.1.1

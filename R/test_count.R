@@ -1,3 +1,7 @@
+#' This function is used to produce the results in synthetic dataset.
+#' @export
+
+test_count <- function(){
 simulation <- function(sample.size = 500, p = 500, alpha=0, rate=0){
   print(system.time(res <- foreach(index = 1:500,.packages = c('concordLearn'),.combine = rbind,.errorhandling='remove')%dopar%{
     ## test
@@ -92,6 +96,5 @@ for (alpha in alpha_seq){
   simulation(sample.size = 350, p=1000, alpha = alpha, rate = rate)
   simulation(sample.size = 500, p=1000, alpha = alpha, rate = rate)
 }
-
-
 stopCluster(cl)
+}
