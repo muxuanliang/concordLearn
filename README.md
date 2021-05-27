@@ -2,7 +2,7 @@
 
 Description: The package implements the proposed method used in the simulation and application to heart failure readmission prediction in this paper.
 
-License: GPL-3
+License: MIT
 
 ## Requirements
 
